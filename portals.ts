@@ -5,6 +5,53 @@ import { dbus_params } from './dbus-utils.js';
 
 Gio._promisify(Gio.DBus.session, 'call', 'call_finish');
 
+export function SettingsProxy() {
+  async function read(namespace: string, key: string) {
+    // @ts-ignore
+    const reply: GLib.Variant = await Gio.DBus.session.call(
+      'org.freedesktop.portal.Desktop',
+      '/org/freedesktop/portal/desktop',
+      'org.freedesktop.portal.Settings',
+      'RequestBackground',
+      dbus_params(
+        namespace,
+        key
+      ),
+      GLib.VariantType.new('(v)'),
+      Gio.DBusCallFlags.NONE,
+      1000,
+      null);
+
+    return reply.recursiveUnpack() as any;
+  }
+
+  function read_all() {
+    throw new Error('Method not implemented');
+    return proxy;
+  }
+
+  function subscribe_settings_changed(cb: (namespace: string, key: string) => void): number {
+    return Gio.DBus.session.signal_subscribe(
+      'org.freedesktop.portal.Desktop',
+      'org.freedesktop.portal.Settings',
+      'SettingsChanged',
+      '/org/freedesktop/portal/desktop',
+      null,
+      Gio.DBusSignalFlags.NONE,
+      (_connection, _sender, _path, _iface, _signal, params: GLib.Variant) => {
+        const vals = params.recursiveUnpack() as any[];
+        cb(vals[0], vals[1]);
+      });
+  }
+
+  const proxy = {
+    read,
+    read_all,
+    subscribe_settings_changed,
+  };
+  return proxy;
+}
+
 export function BackgroundPortal(
 { connection,
 }:
