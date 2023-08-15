@@ -62,6 +62,26 @@ Gio._promisify(Gio.File.prototype,
   'move_async',
   'move_finish');
 
+export function vardict_make(struct: { [key:string]: GLib.Variant | null }) {
+  const arr: GLib.Variant[] = [];
+  for (const key in struct) {
+    const value = struct[key];
+    if (value === undefined) continue;
+    if (value === null) continue;
+    arr.push(
+      GLib.Variant.new_dict_entry(
+        GLib.Variant.new_string(key),
+        GLib.Variant.new_variant(value)
+      )
+    );
+  }
+  const variant = GLib.Variant.new_array(
+    GLib.VariantType.new_dict_entry(GLib.VariantType.new('s'), GLib.VariantType.new('v')),
+    arr
+  );
+  return variant;
+}
+
 export function g_variant_unpack_tuple<T extends Array<any>>(variant: GLib.Variant | null, types: typeofValues[]) {
   if (!(variant instanceof GLib.Variant)) throw new Error(`Expect a GVariant, got ${variant}`);
   const val = variant.deepUnpack();
