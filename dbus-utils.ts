@@ -13,7 +13,7 @@ export function jsval2gvariant(val: any): GLib.Variant {
   if (type === 'string') {
     return GLib.Variant.new_string(val);
   } else if (type === 'number') {
-    return GLib.Variant.new_int16(val);
+    return GLib.Variant.new_int64(val);
   } else if (type === 'object') {
     if (Array.isArray(val)) {
       const arr: GLib.Variant[] = [];
