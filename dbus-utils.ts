@@ -15,6 +15,11 @@ export function jsval2gvariant(val: any): GLib.Variant {
   } else if (type === 'number') {
     return GLib.Variant.new_int16(val);
   } else if (type === 'object') {
+    if (Array.isArray(val)) {
+      const arr: GLib.Variant[] = [];
+      val.forEach(x => arr.push(jsval2gvariant(x)));
+      return GLib.Variant.new_array(GLib.VariantType.new('v'), val);
+    }
     // vardict
     return dbus_vardict(val);
   } else {
