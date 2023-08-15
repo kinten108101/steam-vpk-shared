@@ -8,7 +8,7 @@ export function dbus_params(...args: any[]) {
   return GLib.Variant.new_tuple(arr);
 }
 
-function jsval2gvariant(val: any): GLib.Variant {
+export function jsval2gvariant(val: any): GLib.Variant {
   const type = typeof val;
   if (type === 'string') {
     return GLib.Variant.new_string(val);
@@ -22,7 +22,7 @@ function jsval2gvariant(val: any): GLib.Variant {
   }
 }
 
-function dbus_vardict(dict: { [key: string]: any }): GLib.Variant {
+export function dbus_vardict(dict: { [key: string]: any }): GLib.Variant {
   const entries: GLib.Variant[] = [];
   for (const key in dict) {
     if (dict[key] === undefined || dict[key] === null) continue;
