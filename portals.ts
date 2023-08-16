@@ -73,6 +73,8 @@ export function ListenPortalResponses(
     start,
     end,
   }
+
+  return methods;
 }
 
 export function SettingsProxy() {
