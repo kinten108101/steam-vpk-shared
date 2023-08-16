@@ -16,9 +16,7 @@ export function jsval2gvariant(val: any): GLib.Variant {
     return GLib.Variant.new_int64(val);
   } else if (type === 'object') {
     if (Array.isArray(val)) {
-      const arr: GLib.Variant[] = [];
-      val.forEach(x => arr.push(jsval2gvariant(x)));
-      return GLib.Variant.new_array(GLib.VariantType.new('v'), val);
+      throw new Error(`Convert to Gvariant array is not supported`);
     }
     // vardict
     return dbus_vardict(val);
