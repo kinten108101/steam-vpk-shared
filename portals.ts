@@ -5,6 +5,45 @@ import { dbus_params } from './dbus-utils.js';
 
 Gio._promisify(Gio.DBus.session, 'call', 'call_finish');
 
+export function ListenPortalResponses(
+{ connection,
+}:
+{ connection: Gio.DBusConnection;
+}) {
+  const name = get_formatted_unique_name(connection);
+  let using_response: number | undefined;
+
+  function start() {
+    if (using_response !== undefined) {
+      console.warn(`Already listening to xdg-desktop-portal responses (handler ${using_response})`);
+      return methods;
+    }
+    using_response = Gio.DBus.session.signal_subscribe(
+      'org.freedesktop.portal.Desktop',
+      'org.freedesktop.portal.Request',
+      'Response',
+      `/org/freedesktop/portal/desktop/request/${name}/t`, null, Gio.DBusSignalFlags.NONE,
+      (_connection, _sender, _path, _iface, _signal, params) => {
+        console.log(params.recursiveUnpack());
+      });
+    return methods;
+  }
+
+  function end() {
+    if (using_response === undefined) {
+      console.warn('Not listening for xdg-desktop-portal responses.');
+      return methods;
+    }
+    Gio.DBus.session.signal_unsubscribe(using_response);
+    return methods;
+  }
+
+  const methods = {
+    start,
+    end,
+  }
+}
+
 export function SettingsProxy() {
   async function read(namespace: string, key: string) {
     // @ts-ignore
@@ -52,23 +91,14 @@ export function SettingsProxy() {
   return proxy;
 }
 
-export function BackgroundPortal(
-{ connection,
-}:
-{ connection: Gio.DBusConnection;
-}) {
+export function get_formatted_unique_name(connection: Gio.DBusConnection): string {
   const name = connection.get_unique_name();
   if (name === null) throw new Error;
   const name_in_path = name.replace('.', '_').replace(':', '');
+  return name_in_path;
+}
 
-  const using_response = Gio.DBus.session.signal_subscribe(
-    'org.freedesktop.portal.Desktop',
-    'org.freedesktop.portal.Request',
-    'Response',
-    `/org/freedesktop/portal/desktop/request/${name_in_path}/t`, null, Gio.DBusSignalFlags.NONE,
-    (_connection, _sender, _path, _iface, _signal, params) => {
-      console.log(params.recursiveUnpack());
-    });
+export function BackgroundPortal() {
   function request_background(handler: string = '', config: { reason?: string } = {}) {
     // @ts-ignore
     Gio.DBus.session.call(
@@ -102,14 +132,9 @@ export function BackgroundPortal(
     return proxy;
   }
 
-  function close() {
-    Gio.DBus.session.signal_unsubscribe(using_response);
-  }
-
   const proxy = {
     request_background,
     set_status,
-    close,
   }
 
   return proxy;
