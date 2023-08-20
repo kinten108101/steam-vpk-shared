@@ -1,9 +1,40 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
+import Gtk from 'gi://Gtk';
 
 import { dbus_params } from './dbus-utils.js';
 
 Gio._promisify(Gio.DBus.session, 'call', 'call_finish');
+
+export function OpenURIPortal() {
+  async function OpenURI(
+  { parent_window,
+    uri,
+  }:
+  { parent_window?: Gtk.Window;
+    uri: string;
+  }) {
+    parent_window;
+    // @ts-ignore
+    const reply: GLib.Variant = await Gio.DBus.session.call(
+      'org.freedesktop.portal.Desktop',
+      '/org/freedesktop/portal/desktop',
+      'org.freedesktop.portal.OpenURI',
+      'OpenURI',
+      dbus_params(
+        '', // parent window handler (id), tba
+        uri,
+      ),
+      GLib.VariantType.new('(o)'),
+      Gio.DBusCallFlags.NONE,
+      1000,
+      null);
+  }
+
+  return {
+    OpenURI,
+  }
+}
 
 export function ListenPortalResponses(
 { connection,
