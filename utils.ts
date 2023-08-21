@@ -239,6 +239,9 @@ export function promise_wrap(cb: (...args: any[]) => Promise<void>, ...args: any
   return cb(args).catch(error => { log_error(error) });
 }
 
+/**
+ * A wrapper over logError made for TypeScript. It actually accepts all object types as parameter.
+ */
 export function log_error(error: unknown, msg?: string) {
   if (error instanceof Error) {
     console.error(error, msg);
