@@ -155,6 +155,22 @@ export function registerClass
   return gklass;
 }
 
+export function param_spec_boolean(
+{ name,
+  nick,
+  blurb,
+  flags,
+  default_value,
+}:
+{ name: string,
+  nick?: string,
+  blurb?: string,
+  flags?: GObject.ParamFlags,
+  default_value?: boolean,
+}) {
+  return GObject.param_spec_boolean(name, nick || null, blurb || null, default_value || false, flags || g_param_default);
+}
+
 export function param_spec_string(
 { name,
   nick,
