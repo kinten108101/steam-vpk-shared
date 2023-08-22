@@ -127,6 +127,8 @@ export function g_variant_unpack<T>(variant: GLib.Variant | null, type: typeofVa
 
 export const GtkTemplate = Symbol();
 export const GtkChildren = Symbol();
+export const GtkInternalChildren = Symbol();
+export const GtkCssName = Symbol();
 
 /**
  * @param info GObject Class manifest. Mostly borrowed from {@link GObject.registerClass}, with some important changes:
@@ -143,15 +145,27 @@ export function registerClass
             [key: string]: any;
         };
     }>
-(info: GObject.MetaInfo<Props, Interfaces, Sigs> = {}, klass: { new(...args: any[]): any, [GtkTemplate]?: string, [GtkChildren]?: string[] }) {
+(
+  info: GObject.MetaInfo<Props, Interfaces, Sigs> = {},
+  klass:
+    {
+      new(...args: any[]): any,
+      [GtkTemplate]?: string,
+      [GtkChildren]?: string[],
+      [GtkInternalChildren]?: string[],
+      [GtkCssName]?: string,
+    }
+) {
   const GTypeName = `Stvpk${klass.name}`;
+  console.debug(`Registering ${GTypeName}`);
   const gklass = GObject.registerClass({
     GTypeName,
     Template: klass[GtkTemplate],
     Children: klass[GtkChildren],
+    InternalChildren: klass[GtkInternalChildren],
+    CssName: klass[GtkCssName],
     ...info,
   }, klass);
-  console.debug(`Registered ${GTypeName}`);
   return gklass;
 }
 
