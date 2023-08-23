@@ -185,7 +185,7 @@ export function param_spec_boolean(
   return GObject.param_spec_boolean(name, nick || null, blurb || null, default_value || false, flags || g_param_default);
 }
 
-export function param_spec_string(
+export function param_spec_string<T extends string = string>(
 { name,
   nick,
   blurb,
@@ -196,7 +196,7 @@ export function param_spec_string(
   nick?: string,
   blurb?: string,
   flags?: GObject.ParamFlags,
-  default_value?: string,
+  default_value?: T,
 }) {
   return GObject.param_spec_string(name, nick || name, blurb || name, default_value || null, flags || g_param_default);
 }
