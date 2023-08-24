@@ -288,3 +288,7 @@ export function isNumberString(str: string): boolean {
   }
   return true;
 }
+
+export function generate_timed_id() {
+  return Number((new Date()).getTime().toString().substring(7) + String(Math.round(Math.random() * 100)));
+}
