@@ -82,6 +82,7 @@ export function vardict_make(struct: { [key:string]: GLib.Variant | null }) {
   return variant;
 }
 
+/** @deprecated Use GLib.Variant#deepUnpack or GLib.Variant#recursiveUnpack instead */
 export function g_variant_unpack_tuple<T extends Array<any>>(variant: GLib.Variant | null, types: typeofValues[]) {
   if (!(variant instanceof GLib.Variant)) throw new Error(`Expect a GVariant, got ${variant}`);
   const val = variant.deepUnpack();
@@ -94,6 +95,7 @@ export function g_variant_unpack_tuple<T extends Array<any>>(variant: GLib.Varia
   return val as T;
 }
 
+/** @deprecated Use GLib.Variant#deepUnpack or GLib.Variant#recursiveUnpack instead */
 export function g_variant_unpack_dict<T extends Object>(variant: GLib.Variant | null, structure: { [key: string]: typeofValues }) {
   if (!(variant instanceof GLib.Variant)) throw new TypeError(`Expect a GVariant, got ${variant}`);
   const val = variant.deepUnpack();
@@ -118,6 +120,7 @@ export function g_variant_unpack_dict<T extends Object>(variant: GLib.Variant | 
 
 type typeofValues = 'string' | 'number' | 'bigint' | 'boolean' | 'symbol' | 'undefined' | 'object' | 'function';
 
+/** @deprecated Use GLib.Variant#deepUnpack or GLib.Variant#recursiveUnpack instead */
 export function g_variant_unpack<T>(variant: GLib.Variant | null, type: typeofValues) {
   if (!(variant instanceof GLib.Variant)) throw new Error(`Expect a GVariant, got ${variant}`);
   const val = variant.unpack();
