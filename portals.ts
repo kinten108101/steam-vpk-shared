@@ -10,9 +10,11 @@ export function OpenURIPortal() {
   async function OpenURI(
   { parent_window,
     uri,
+    options,
   }:
   { parent_window?: Gtk.Window;
     uri: string;
+    options?: any;
   }) {
     parent_window;
     // @ts-ignore
@@ -24,6 +26,7 @@ export function OpenURIPortal() {
       dbus_params(
         '', // parent window handler (id), tba
         uri,
+        ( typeof options === 'object' ) ? options : {}
       ),
       GLib.VariantType.new('(o)'),
       Gio.DBusCallFlags.NONE,

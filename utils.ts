@@ -82,6 +82,7 @@ export function vardict_make(struct: { [key:string]: GLib.Variant | null }) {
   return variant;
 }
 
+/** @deprecated Use GLib.Variant#deepUnpack or GLib.Variant#recursiveUnpack instead */
 export function g_variant_unpack_tuple<T extends Array<any>>(variant: GLib.Variant | null, types: typeofValues[]) {
   if (!(variant instanceof GLib.Variant)) throw new Error(`Expect a GVariant, got ${variant}`);
   const val = variant.deepUnpack();
@@ -94,6 +95,7 @@ export function g_variant_unpack_tuple<T extends Array<any>>(variant: GLib.Varia
   return val as T;
 }
 
+/** @deprecated Use GLib.Variant#deepUnpack or GLib.Variant#recursiveUnpack instead */
 export function g_variant_unpack_dict<T extends Object>(variant: GLib.Variant | null, structure: { [key: string]: typeofValues }) {
   if (!(variant instanceof GLib.Variant)) throw new TypeError(`Expect a GVariant, got ${variant}`);
   const val = variant.deepUnpack();
@@ -118,6 +120,7 @@ export function g_variant_unpack_dict<T extends Object>(variant: GLib.Variant | 
 
 type typeofValues = 'string' | 'number' | 'bigint' | 'boolean' | 'symbol' | 'undefined' | 'object' | 'function';
 
+/** @deprecated Use GLib.Variant#deepUnpack or GLib.Variant#recursiveUnpack instead */
 export function g_variant_unpack<T>(variant: GLib.Variant | null, type: typeofValues) {
   if (!(variant instanceof GLib.Variant)) throw new Error(`Expect a GVariant, got ${variant}`);
   const val = variant.unpack();
@@ -127,6 +130,8 @@ export function g_variant_unpack<T>(variant: GLib.Variant | null, type: typeofVa
 
 export const GtkTemplate = Symbol();
 export const GtkChildren = Symbol();
+export const GtkInternalChildren = Symbol();
+export const GtkCssName = Symbol();
 
 /**
  * @param info GObject Class manifest. Mostly borrowed from {@link GObject.registerClass}, with some important changes:
@@ -143,19 +148,31 @@ export function registerClass
             [key: string]: any;
         };
     }>
-(info: GObject.MetaInfo<Props, Interfaces, Sigs> = {}, klass: { new(...args: any[]): any, [GtkTemplate]?: string, [GtkChildren]?: string[] }) {
+(
+  info: GObject.MetaInfo<Props, Interfaces, Sigs> = {},
+  klass:
+    {
+      new(...args: any[]): any,
+      [GtkTemplate]?: string,
+      [GtkChildren]?: string[],
+      [GtkInternalChildren]?: string[],
+      [GtkCssName]?: string,
+    }
+) {
   const GTypeName = `Stvpk${klass.name}`;
+  console.debug(`Registering ${GTypeName}`);
   const gklass = GObject.registerClass({
     GTypeName,
     Template: klass[GtkTemplate],
     Children: klass[GtkChildren],
+    InternalChildren: klass[GtkInternalChildren],
+    CssName: klass[GtkCssName],
     ...info,
   }, klass);
-  console.debug(`Registered ${GTypeName}`);
   return gklass;
 }
 
-export function param_spec_string(
+export function param_spec_boolean(
 { name,
   nick,
   blurb,
@@ -166,7 +183,23 @@ export function param_spec_string(
   nick?: string,
   blurb?: string,
   flags?: GObject.ParamFlags,
-  default_value?: string,
+  default_value?: boolean,
+}) {
+  return GObject.param_spec_boolean(name, nick || null, blurb || null, default_value || false, flags || g_param_default);
+}
+
+export function param_spec_string<T extends string = string>(
+{ name,
+  nick,
+  blurb,
+  flags,
+  default_value,
+}:
+{ name: string,
+  nick?: string,
+  blurb?: string,
+  flags?: GObject.ParamFlags,
+  default_value?: T,
 }) {
   return GObject.param_spec_string(name, nick || name, blurb || name, default_value || null, flags || g_param_default);
 }
@@ -257,4 +290,8 @@ export function isNumberString(str: string): boolean {
     if (str.charCodeAt(i) < 48 || str.charCodeAt(i) > 57) return false;
   }
   return true;
+}
+
+export function generate_timed_id() {
+  return Number((new Date()).getTime().toString().substring(7) + String(Math.round(Math.random() * 100)));
 }
