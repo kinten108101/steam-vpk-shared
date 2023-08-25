@@ -131,6 +131,11 @@ export function get_formatted_unique_name(connection: Gio.DBusConnection): strin
   return name_in_path;
 }
 
+export function get_formatted_unique_name_str(name: string): string {
+  const name_in_path = name.replace('.', '_').replace(':', '');
+  return name_in_path;
+}
+
 export function BackgroundPortal() {
   function request_background(handler: string = '', config: { reason?: string } = {}) {
     // @ts-ignore
