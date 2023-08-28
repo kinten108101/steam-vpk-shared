@@ -16,7 +16,8 @@ export function jsval2gvariant(val: any): GLib.Variant {
     return GLib.Variant.new_int64(val);
   } else if (type === 'object') {
     if (Array.isArray(val)) {
-      throw new Error(`Convert to Gvariant array is not supported`);
+      const arr = val.map(x => jsval2gvariant(x));
+      return GLib.Variant.new_array(null, arr);
     }
     // vardict
     return dbus_vardict(val);
@@ -29,8 +30,12 @@ export function dbus_vardict(dict: { [key: string]: any }): GLib.Variant {
   const entries: GLib.Variant[] = [];
   for (const key in dict) {
     if (dict[key] === undefined || dict[key] === null) continue;
-    const gvariant = jsval2gvariant(dict[key]);
+    const gvariant = jsval2gvariant(dict[key]) || GLib.Variant.new_string('');
     const entry = GLib.Variant.new_dict_entry(GLib.Variant.new_string(key), GLib.Variant.new_variant(gvariant));
+    entries.push(entry);
+  }
+  if (entries.length < 1) {
+    const entry = GLib.Variant.new_dict_entry(GLib.Variant.new_string(''), GLib.Variant.new_variant(GLib.Variant.new_string('')));
     entries.push(entry);
   }
   const vardict = GLib.Variant.new_array(GLib.VariantType.new_dict_entry(GLib.VariantType.new('s'), GLib.VariantType.new('v')), entries);

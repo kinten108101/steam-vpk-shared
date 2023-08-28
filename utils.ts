@@ -82,6 +82,25 @@ export function vardict_make(struct: { [key:string]: GLib.Variant | null }) {
   return variant;
 }
 
+export function vardict_make_v2(sarr: [string, GLib.Variant | null][]) {
+  const arr: GLib.Variant[] = [];
+  for (const [key, value] of sarr) {
+    if (value === undefined) continue;
+    if (value === null) continue;
+    arr.push(
+      GLib.Variant.new_dict_entry(
+        GLib.Variant.new_string(key),
+        GLib.Variant.new_variant(value)
+      )
+    );
+  }
+  const variant = GLib.Variant.new_array(
+    GLib.VariantType.new_dict_entry(GLib.VariantType.new('s'), GLib.VariantType.new('v')),
+    arr
+  );
+  return variant;
+}
+
 /** @deprecated Use GLib.Variant#deepUnpack or GLib.Variant#recursiveUnpack instead */
 export function g_variant_unpack_tuple<T extends Array<any>>(variant: GLib.Variant | null, types: typeofValues[]) {
   if (!(variant instanceof GLib.Variant)) throw new Error(`Expect a GVariant, got ${variant}`);
