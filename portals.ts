@@ -140,9 +140,10 @@ export function get_formatted_unique_name_str(name: string): string {
 }
 
 export function BackgroundPortal() {
-  function request_background(handler: string = '', config: { reason?: string } = {}) {
+  async function request_background(handler: string = '', config: { reason?: string } = {}) {
+    try {
     // @ts-ignore
-    Gio.DBus.session.call(
+    await Gio.DBus.session.call(
       'org.freedesktop.portal.Desktop',
       '/org/freedesktop/portal/desktop',
       'org.freedesktop.portal.Background',
@@ -152,23 +153,37 @@ export function BackgroundPortal() {
         config,
       ),
       GLib.VariantType.new('(o)'), Gio.DBusCallFlags.NONE, 1000, null);
+    } catch (error) {
+      if (error instanceof GLib.Error && error.matches(Gio.io_error_quark(), Gio.IOErrorEnum.DBUS_ERROR)) {
+        Gio.dbus_error_strip_remote_error(error);
+      }
+      throw error;
+    }
 
     return proxy;
   }
 
-  function set_status(status_message: string) {
+  async function set_status(status_message: string) {
     const param_status = GLib.Variant.new_tuple([
       GLib.Variant.new_array(GLib.VariantType.new_dict_entry(GLib.VariantType.new('s'), GLib.VariantType.new('v')), [
         GLib.Variant.new_dict_entry(GLib.Variant.new_string('message'), GLib.Variant.new_variant(GLib.Variant.new_string(status_message))),
       ]),
     ]);
 
+    try {
     // @ts-ignore
-    Gio.DBus.session.call(
-      'org.freedesktop.portal.Desktop',
-      '/org/freedesktop/portal/desktop',
-      'org.freedesktop.portal.Background',
-      'SetStatus', param_status, null, Gio.DBusCallFlags.NONE, 1000, null);
+      await Gio.DBus.session.call(
+        'org.freedesktop.portal.Desktop',
+        '/org/freedesktop/portal/desktop',
+        'org.freedesktop.portal.Background',
+        'SetStatus', param_status, null, Gio.DBusCallFlags.NONE, 1000, null);
+    } catch (error) {
+      Gio.IOErrorEnum
+      if (error instanceof GLib.Error && error.matches(Gio.io_error_quark(), Gio.IOErrorEnum.DBUS_ERROR)) {
+        Gio.dbus_error_strip_remote_error(error);
+      }
+      throw error;
+    }
 
     return proxy;
   }
