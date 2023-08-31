@@ -25,52 +25,6 @@ export function vardict_make(struct: { [key:string]: GLib.Variant | null }) {
   return variant;
 }
 
-/** @deprecated Use GLib.Variant#deepUnpack or GLib.Variant#recursiveUnpack instead */
-export function g_variant_unpack_tuple<T extends Array<any>>(variant: GLib.Variant | null, types: typeofValues[]) {
-  if (!(variant instanceof GLib.Variant)) throw new Error(`Expect a GVariant, got ${variant}`);
-  const val = variant.deepUnpack();
-  if (!Array.isArray(val)) {
-    throw new TypeError(`Expect an array for GVariant tuple content, got ${typeof val}`);
-  }
-  val.forEach((x, i) => {
-    if (typeof x !== types[i]) throw new Error(`Expect type ${types[i]} for the ${i}th tuple element, got ${typeof x}`);
-  })
-  return val as T;
-}
-
-/** @deprecated Use GLib.Variant#deepUnpack or GLib.Variant#recursiveUnpack instead */
-export function g_variant_unpack_dict<T extends Object>(variant: GLib.Variant | null, structure: { [key: string]: typeofValues }) {
-  if (!(variant instanceof GLib.Variant)) throw new TypeError(`Expect a GVariant, got ${variant}`);
-  const val = variant.deepUnpack();
-  if (typeof val !== 'object') {
-    throw new TypeError();
-  }
-  if (val === null) {
-    throw new TypeError();
-  }
-  const dict = val as { [key: string]: any };
-  Object.keys(structure).forEach(key => {
-    const val = dict[key];
-    if (val === undefined) {
-      throw new TypeError(`Key \"${key}\" does not exist in GVariant Dictionary`);
-    }
-    if (typeof val !== structure[key]) {
-      throw new TypeError(`Expect type ${structure[key]} for value of key \"${key}\", got ${typeof val}`);
-    }
-  });
-  return val as T;
-}
-
-type typeofValues = 'string' | 'number' | 'bigint' | 'boolean' | 'symbol' | 'undefined' | 'object' | 'function';
-
-/** @deprecated Use GLib.Variant#deepUnpack or GLib.Variant#recursiveUnpack instead */
-export function g_variant_unpack<T>(variant: GLib.Variant | null, type: typeofValues) {
-  if (!(variant instanceof GLib.Variant)) throw new Error(`Expect a GVariant, got ${variant}`);
-  const val = variant.unpack();
-  if (typeof val !== type) throw new Error(`Expect a ${type}, got ${val}`);
-  return val as T;
-}
-
 export const GtkTemplate = Symbol();
 export const GtkChildren = Symbol();
 export const GtkInternalChildren = Symbol();
@@ -182,35 +136,6 @@ export function param_spec_object(
   objectType?: GObject.GType;
 }) {
   return GObject.ParamSpec.object(name, nick || name, blurb || name, flags || g_param_default, objectType || GObject.Object.$gtype);
-}
-
-
-/**
- * @deprecated This is very slow.
- */
-export function array_insert<T>(source: Array<T>, item: T, index: number) {
-  for (let i = source.length; i > index; i--) {
-    source[i] = source[i-1] as T;
-  }
-  source[index] = item;
-}
-
-export function promise_wrap(cb: (...args: any[]) => Promise<void>, ...args: any[]) {
-  return cb(args).catch(error => { log_error(error) });
-}
-
-/**
- * A wrapper over logError made for TypeScript. It actually accepts all object types as parameter.
- */
-export function log_error(error: unknown, msg?: string) {
-  if (error instanceof Error) {
-    console.error(error, msg);
-    return;
-  } else if (error instanceof GLib.Error) {
-    logError(error, msg);
-    return;
-  }
-  console.error(error, msg);
 }
 
 export function g_listbox_move(listbox: Gtk.ListBox, row: Gtk.ListBoxRow, target_idx: number) {
