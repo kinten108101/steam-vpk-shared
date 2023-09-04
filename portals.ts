@@ -135,7 +135,7 @@ export function get_formatted_unique_name(connection: Gio.DBusConnection): strin
 }
 
 export function get_formatted_unique_name_str(name: string): string {
-  const name_in_path = name.replace('.', '_').replace(':', '');
+  const name_in_path = name.replaceAll(/[\.\-\:]/gm, '_');
   return name_in_path;
 }
 
