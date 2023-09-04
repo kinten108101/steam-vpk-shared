@@ -5,6 +5,13 @@ import Gio from 'gi://Gio';
 
 export const g_param_default = GObject.ParamFlags.READWRITE | GObject.ParamFlags.CONSTRUCT;
 
+export const TYPE_JSOBJECT: GObject.GType = {
+  __type__() {
+    return undefined;
+  },
+  name: 'JsObject',
+}
+
 export function vardict_make(struct: { [key:string]: GLib.Variant | null }) {
   const arr: GLib.Variant[] = [];
   for (const key in struct) {
