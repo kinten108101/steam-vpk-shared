@@ -59,9 +59,13 @@ export function vardict_make_v2(sarr: [string, GLib.Variant | null][]) {
   return variant;
 }
 
+/** @deprecated */
 export const GtkTemplate = Symbol();
+/** @deprecated */
 export const GtkChildren = Symbol();
+/** @deprecated */
 export const GtkInternalChildren = Symbol();
+/** @deprecated */
 export const GtkCssName = Symbol();
 
 /**
@@ -69,6 +73,8 @@ export const GtkCssName = Symbol();
  *
  * - Class registrations are verbalized as debug logs;
  * - Default GTypeName is Stvpk[class name] instead of Gjs_[class name].
+ *
+ * @deprecated
  */
 export function registerClass
 <Props extends { [key: string]: GObject.ParamSpec },
@@ -103,6 +109,7 @@ export function registerClass
   return gklass;
 }
 
+/** @deprecated Use built-in GObject.ParamSpec methods instead */
 export function param_spec_boolean(
 { name,
   nick,
@@ -119,6 +126,7 @@ export function param_spec_boolean(
   return GObject.param_spec_boolean(name, nick || null, blurb || null, default_value || false, flags || g_param_default);
 }
 
+/** @deprecated Use built-in GObject.ParamSpec methods instead */
 export function param_spec_string<T extends string = string>(
 { name,
   nick,
@@ -135,6 +143,7 @@ export function param_spec_string<T extends string = string>(
   return GObject.param_spec_string(name, nick || name, blurb || name, default_value || null, flags || g_param_default);
 }
 
+/** @deprecated Use built-in GObject.ParamSpec methods instead */
 export function param_spec_variant(
 {
   name,
@@ -154,6 +163,7 @@ export function param_spec_variant(
   return GObject.param_spec_variant(name, blurb || name, nick || name, type, default_value || null, flags || g_param_default);
 }
 
+/** @deprecated Use built-in GObject.ParamSpec methods instead */
 export function param_spec_object(
 {
   name,
