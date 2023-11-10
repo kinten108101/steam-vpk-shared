@@ -21,6 +21,8 @@ export function jsval2gvariant(val: any): GLib.Variant {
     }
     // vardict
     return dbus_vardict(val);
+  } else if (type === 'boolean') {
+    return GLib.Variant.new_boolean(val);
   } else {
     throw new Error(`Could not convert JS value to GVariant. Received ${val}.`);
   }

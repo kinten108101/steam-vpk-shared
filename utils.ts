@@ -25,6 +25,14 @@ export function vardict_make(struct: { [key:string]: GLib.Variant | null }) {
       )
     );
   }
+  if (arr.length <= 0) {
+    arr.push(
+      GLib.Variant.new_dict_entry(
+        GLib.Variant.new_string(''),
+        GLib.Variant.new_variant(GLib.Variant.new_string('')),
+      )
+    );
+  }
   const variant = GLib.Variant.new_array(
     GLib.VariantType.new_dict_entry(GLib.VariantType.new('s'), GLib.VariantType.new('v')),
     arr
